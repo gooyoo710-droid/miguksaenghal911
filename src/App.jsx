@@ -78,7 +78,7 @@ async function save(key, val) {
   try { await window.storage.set(key, JSON.stringify(val)); } catch {}
 }
 
-// ── AI 사용 횟수 관리 ────────────────────────────────────
+// ── Claude API (백엔드 프록시 경유 — API키 보호) ─────────
 const AI_MAX = 3;
 async function getAiCount() {
   try { const r=await window.storage.get("ai_count"); return r?Number(r.value):0; } catch{ return 0; }
@@ -89,18 +89,15 @@ async function incAiCount() {
   return n+1;
 }
 
-// ── Claude API (사용량 게이트 포함) ──────────────────────
 async function askClaude(system, messages, onBlocked) {
   const count=await getAiCount();
   if(count>=AI_MAX){ onBlocked&&onBlocked(); return null; }
   await incAiCount();
   try {
-    const r = await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        model:"claude-sonnet-4-20250514", max_tokens:1500, system,
-        messages:Array.isArray(messages)?messages:[{role:"user",content:messages}],
-      }),
+    const r = await fetch("/api/claude", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ system, messages, max_tokens:1500 }),
     });
     if(!r.ok) throw new Error(`HTTP ${r.status}`);
     const d=await r.json();
@@ -108,17 +105,19 @@ async function askClaude(system, messages, onBlocked) {
   } catch(e) { return `오류: ${e.message}. 잠시 후 다시 시도해 주세요.`; }
 }
 
-// ── Claude API (이미지+텍스트) ────────────────────────────
+// ── Claude API (이미지+텍스트, 백엔드 프록시) ────────────
 async function askClaudeWithImage(system, userText, imageBase64, mediaType="image/jpeg") {
   try {
-    const r = await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST", headers:{"Content-Type":"application/json"},
+    const r = await fetch("/api/claude", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
-        model:"claude-sonnet-4-20250514", max_tokens:1500, system,
+        system,
         messages:[{role:"user", content:[
           {type:"image", source:{type:"base64", media_type:mediaType, data:imageBase64}},
-          {type:"text",  text:userText},
+          {type:"text", text:userText},
         ]}],
+        max_tokens:1500,
       }),
     });
     if(!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -1516,13 +1515,13 @@ function TicketTab(){
 {"violation":"위반내용","state":"주코드2글자","stateName":"주이름한국어","amount":"벌금금액","dueDate":"마감일","ticketNumber":"티켓번호","points":"면허점수차감","schoolAvailable":true,"recommendation":"school또는pay또는court","reason":"추천이유2-3문장","insuranceImpact":"보험료예상인상액"}
 읽을 수 없는 항목은 "확인불가"로 표시.`;
     try{
-      const r=await fetch("https://api.anthropic.com/v1/messages",{
+      const r=await fetch("/api/claude",{
         method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:SYS,
+        body:JSON.stringify({system:SYS,
           messages:[{role:"user",content:[
             {type:"image",source:{type:"base64",media_type:"image/jpeg",data:imageBase64}},
             {type:"text",text:"이 교통 티켓을 분석해주세요."}
-          ]}]})
+          ]}], max_tokens:1000})
       });
       const d=await r.json();
       const text=d.content?.[0]?.text||"{}";
