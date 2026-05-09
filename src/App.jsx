@@ -351,7 +351,7 @@ function ScanTab({onPremium}) {
 
 // ── 카메라 버튼 (안드로이드 호환 — input overlay 방식) ──
 // display:none 대신 투명 input을 버튼 위에 덮어서 터치 이벤트 직접 전달
-function CameraBtn({onImage, children, color=C.sky, style:extraStyle={}}) {
+function CameraBtn({onImage, children, color=C.sky, style: extraStyle={}}) {
   const handleChange = async(e) => {
     const file = e.target.files?.[0];
     if (!file) return;
