@@ -278,6 +278,7 @@ function ScanTab({onPremium}) {
         onImage={handleImages}
         preview={null}
         label={pages.length>0?`${pages.length}장 추가됨 · 탭하여 더 추가`:"탭하여 사진 찍기 / 갤러리 선택"}/>
+    </div>
 
     {pages.length>0&&<div style={{...st.card,marginBottom:12}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
@@ -349,15 +350,17 @@ function ScanTab({onPremium}) {
   </div>;
 }
 
-// ── 카메라 버튼 (안드로이드 호환 — input overlay 방식) ──
-// display:none 대신 투명 input을 버튼 위에 덮어서 터치 이벤트 직접 전달
-function CameraBtn({onImage, children, color=C.sky, style: extraStyle={}}) {
+function CameraBtn(props) {
+  const onImage = props.onImage;
+  const children = props.children;
+  const color = props.color || C.sky;
+  const extraStyle = props.btnStyle || {};
   const handleChange = async(e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const b64 = await fileToBase64(file);
     onImage(b64, file.type);
-    e.target.value = ""; // 같은 파일 재선택 가능하게
+    e.target.value = "";
   };
   return (
     <div style={{position:"relative", overflow:"hidden",
@@ -799,7 +802,7 @@ function DocsTab() {
         💾 서류 저장
       </Btn>
 
-      <CameraBtn onImage={handleDocScan} color="#E2E8F0" style={{marginTop:8}}>
+      <CameraBtn onImage={handleDocScan} color="#E2E8F0" btnStyle={{marginTop:8}}>
         <span style={{color:C.textMid}}>📷 다른 사진으로 다시 스캔</span>
       </CameraBtn>
     </Modal>
@@ -1080,7 +1083,7 @@ function BudgetTab() {
           </div>}
         </div>
         <Btn onClick={applyScan} color={C.green}>✅ 가계부에 추가</Btn>
-        <CameraBtn onImage={(b64,type)=>{handleScanFile(b64,type);}} color="#94A3B8" style={{marginTop:8}}>
+        <CameraBtn onImage={(b64,type)=>{handleScanFile(b64,type);}} color="#94A3B8" btnStyle={{marginTop:8}}>
           <span style={{color:"#fff"}}>📷 다른 사진으로 다시 스캔</span>
         </CameraBtn>
       </div>}
