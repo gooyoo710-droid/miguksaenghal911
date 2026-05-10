@@ -3,6 +3,8 @@ import React, { useState, useEffect, useRef } from "react";
 // ── 디자인 토큰 ─────────────────────────────────────────
 const C = {
   bg:"#F4F6FA", bgCard:"#FFFFFF", bgHeader:"#FFFFFF",
+
+  
   navy:"#1A2B45", navyMid:"#2C4066", navyLt:"#3D5A8A",
   gold:"#B8820A", goldLt:"#D4A017", goldBg:"#FFF8E7",
   red:"#D94040", redLt:"#E57373", redBg:"#FFF0F0",
