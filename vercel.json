@@ -1,1 +1,12 @@
-{"rewrites":[{"source":"/(.*)","destination":"/index.html"}]}
+{
+  "functions": {
+    "api/claude.js": {
+      "memory": 512,
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    { "source": "/api/claude", "destination": "/api/claude" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
