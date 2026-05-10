@@ -79,7 +79,7 @@ async function save(key, val) {
 }
 
 // ── Claude API (백엔드 프록시 경유 — API키 보호) ─────────
-const AI_MAX = 3;
+const AI_MAX = 999;
 async function getAiCount() {
   try { const r=await window.storage.get("ai_count"); return r?Number(r.value):0; } catch{ return 0; }
 }
