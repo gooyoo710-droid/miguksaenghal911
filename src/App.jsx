@@ -101,7 +101,7 @@ async function askClaude(system, messages, onBlocked) {
     });
     if(!r.ok) throw new Error(`HTTP ${r.status}`);
     const d=await r.json();
-    return d.content?.[0]?.text || "응답을 받지 못했습니다.";
+    return d?.content?.[0]?.text || d?.error || "응답을 받지 못했습니다.";
   } catch(e) { return `오류: ${e.message}. 잠시 후 다시 시도해 주세요.`; }
 }
 
